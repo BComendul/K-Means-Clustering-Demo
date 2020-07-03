@@ -1,0 +1,46 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+header{
+  background: white;
+  align-content: center;
+  padding: 20px;
+}
+body{
+  background: #ffff99;
+}
+button{
+  padding: 3px;
+ border-radius: 20px;
+}
+h1{
+  text-align: center;
+  background-color: white;
+}
+
+.wrapper{
+  display: grid;
+  grid-template-columns: 80% 20%;
+}
+.subwrapper{
+  display: grid;
+  grid-row-gap: 10px;
+  align-items: center;
+}
+div{
+  text-align: center;
+  padding: 10px;
+}
+option{
+  align-self: center;
+}
+h2{
+  text-align: center;
+  background-color: white;
+}
+canvas{
+width: auto;
+height: auto;
+}

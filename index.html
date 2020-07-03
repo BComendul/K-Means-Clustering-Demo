@@ -1,0 +1,44 @@
+<html lang="en" dir="ltr">
+<head>
+  <title>K-Means Clustering</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+  <link rel="stylesheet" href="index.css">
+  <header>
+    <h1>Machine Learning Algorithms</h1>
+    <h2>K-Means Clustering<h2>
+  </header>
+</head>
+
+<body>
+  <div>
+    <d1>K-Means Clustering is a classification algorithm designed to distribute data into k different groups</d1>
+    </div>
+  <div>
+    <d1>The k grouping points start off as random. Through the iterations the points will settle and create stable groups. </d1>
+  </div>
+  <div>
+  <d1>Watch as the algorithm works by grouping then resetting the K-means!</d1>
+</div>
+<div class="wrapper">
+<div>
+  <canvas id="myChart"></canvas>
+  <d1 id="messageID"></d1>
+</div>
+  <div class= "subwrapper">
+  <button onclick="groupPoints()">Group Points</button>
+  <button onclick="resetMeans()">Reset K-means</button>
+  <d1>Select K:<d1>
+  <select title="K-Value" name="K-Value" id="k-options">
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+      <option value="6">6</option>
+  </select>
+  <button onclick="randomizeData()">Restart Data</button>
+  </div>
+</div>
+      <script src="index.js"></script>
+    </body>
+
+</html>
