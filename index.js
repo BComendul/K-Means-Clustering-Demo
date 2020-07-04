@@ -1,13 +1,14 @@
 
 
+
 //Get chart from canvas in html
 var ctx = document.getElementById('myChart').getContext('2d');
-
+let myChart;
 //establish global variables
 let globalNumPoints=300;
 let globalNumGroups=document.getElementById('k-options').value;
 let labelsList=["Group:1","Group:2","Group:3","Group:4","Group:5","Group:6"];
-let backgroundColorList=['rgb(200, 99, 255, 0.5)','rgb(0, 99, 255, 0.5)','rgba(100, 200, 132, 0.5)','rgb(255, 0,255, 0.5)','rgb(255, 255, 0, 0.5)','rgb(100, 100, 100, 0.75)']
+let backgroundColorList=['rgb(200, 99, 255, 0.99)','rgb(0, 99, 255, 0.5)','rgba(100, 200, 132, 0.5)','rgb(255, 0,255, 0.5)','rgb(255, 255, 0, 0.5)','rgb(100, 100, 100, 0.75)']
 
 //initialize chart labels and points
 let labels= fillxlabel(globalNumPoints);
@@ -17,17 +18,32 @@ let dataset=generateDataSet(globalNumGroups);
 
 myData = {
         labels: labels,
-        datasets: dataset
+        datasets: dataset,
     };
 
 // Default chart defined with type: 'line'
 Chart.defaults.global.defaultFontFamily = "monospace";
 Chart.defaults.global.animation.duration=1000;
 
-
-var myChart = new Chart(ctx, {
+myChart = new Chart(ctx, {
     type: 'line',
-    data: myData
+    data: myData,
+    options: {
+      scales:{
+        xAxes:[{
+          scaleLabel:{
+            display:true,
+            labelString:"Products Purchased This Year"
+          }
+        }],
+        yAxes:[{
+          scaleLabel:{
+            display:true,
+            labelString:'Lifetime Dollar Value Spent (x100)'
+          }
+        }]
+      }
+    }
 });
 
 
@@ -35,20 +51,40 @@ var myChart = new Chart(ctx, {
 function changeK(){
   //creates an entirely new Chart object with new data and updates k, if changed.
   globalNumGroups=document.getElementById('k-options').value;
+
   myChart.destroy();
   labels=fillxlabel(globalNumPoints);
   listed=filllabels(globalNumPoints,globalNumGroups);
   dataset=generateDataSet(globalNumGroups);
+
   myData = {
           labels: labels,
           datasets: dataset
       };
-      myChart = new Chart(ctx, {
+  myChart = new Chart(ctx, {
           type: 'line',
-          data: myData
+          data: myData,
+          options: {
+            scales:{
+              xAxes:[{
+                scaleLabel:{
+                  display:true,
+                  labelString:"Lifetime Products Purchased"
+                }
+              }],
+              yAxes:[{
+                scaleLabel:{
+                  display:true,
+                  labelString:'Products Purchased'
+                }
+              }]
+            }
+          }
       });
+
       myChart.update();
 }
+
 
 //generates initial random datasets dependent on k groups
 function generateDataSet(numGroups){
@@ -73,13 +109,14 @@ for (let i=0;i<numGroups;i++){
     data: listed[i+1],
   })
 }
+
   return data;
 }
 
 
 function fillxlabel(numPoints){
   const labels= [];
-  for (let i=0;i<numPoints;i++){
+  for (let i=0;i<numPoints+1;i++){
     labels.push(i);
   }
   return labels;
@@ -97,25 +134,17 @@ function filllabels(numPoints, numGroups) {
     listedGroups[i].push({x:a,y:b});
 }
 let point;
+let count=0;
   for (var i=1;i<numPoints;i++){
-  /*  if (i<numPoints/4){
-      point=Math.floor(Math.random() * 150)
-      while (point<50){
-        point=Math.floor(Math.random() * 150)
-      }
-    }else if (i<numPoints/2){
-      point=Math.floor(Math.random() * 100)
-
-    }else{
-      point=Math.floor(Math.random() * 150)
-      while (point<20){
-      point=Math.floor(Math.random() * 150)
-      }
-    }*/
     point=randomizing(i,numPoints);
       listedGroups[0].push({x:i,y:point});
+      count++;
   }
+  console.log(count);
+
+
   return listedGroups;
+
 };
 
 
@@ -131,21 +160,34 @@ for (let i=0;i<numPoints;i++){
 
   chart.update();
 }
-//helper function to make random dataset
+
+//helper function to make semi-random dataset
 function randomizing(i,numPoints){
     let point;
       if (i<numPoints/4){
-        point=Math.floor(Math.random() * 150)
-        while (point<50){
-          point=Math.floor(Math.random() * 150)
+        point=Math.floor(Math.random() * 300);
+        if(point>i*2){
+          point=Math.floor(Math.random() * 300);
+        }
+        if (point>i){
+        point=Math.floor(Math.random() * 3*i);
         }
       }else if (i<numPoints/2){
-        point=Math.floor(Math.random() * 100)
+        point=Math.floor(Math.random() * 300);
+        if (point>i/2){
+          point=Math.floor(Math.random() * 300);
+        }
 
       }else{
-        point=Math.floor(Math.random() * 150)
-        while (point<20){
-        point=Math.floor(Math.random() * 150)
+        point=Math.floor(Math.random() * 300);
+        if (point<i){
+        point=Math.floor(Math.random() * 300);
+        }
+        if (point<i/2){
+        point=Math.floor(Math.random() * 300);
+        }
+        if (point<i/2){
+        point=Math.floor(Math.random() * 300);
         }
       }
         return point;
@@ -158,28 +200,29 @@ function removeData(chart) {
     let length=chart.data.datasets[z].data.length;
     for (let i=0;i<length;i++){
       chart.data.datasets[z].data.pop();
-    }
+    }}
   }
 
-}
+
+//function called when Group button is pressed
 function groupPoints(){
    document.getElementById("messageID").innerText="All points are assigned to the closest grouping, calculated from their coordinates";
 let length=myChart.data.datasets[0].data.length;
 let count=0;
     for (let i=0;i<length;i++){
-
+      //used setTimeout in order to create step-update effect
     setTimeout(() => {
         let y=myChart.data.datasets[0].data.pop();
         let group=findGroup(y.x,y.y);
         myChart.data.datasets[group].data.push({x:y.x,y:y.y});
       myChart.update();
     }, 5*i);
-
   }
 }
 
-
+//function called when reset button is pressed
 function resetMeans(){
+  //initally checks to make sure groups need to be reset
     let pointsInGroups=0;
     for (let i=1;i<myChart.data.datasets.length;i++){
         pointsInGroups+=myChart.data.datasets[i].data.length;
@@ -189,12 +232,12 @@ function resetMeans(){
 }else{
     document.getElementById("messageID").innerText="Whoops! Try grouping the points first";
 }
-
   let changed=false;
   let newx=0;
   let newy=0;
   let count=0;
 
+//establishes new values for each k
   for (let z=1;z<myChart.data.datasets.length;z++){
     for (let i=1;i<myChart.data.datasets[z].data.length;i++){
         newx+=myChart.data.datasets[z].data[i].x;
@@ -215,35 +258,36 @@ function resetMeans(){
     count=0;
   }
 
+//showing new message if clustering algorithm has reached final groups
 if (changed==false&&pointsInGroups>myChart.data.datasets.length-1){
   document.getElementById("messageID").innerText="Means have stabilized!";
 }
 
 myChart.update();
-
 //shows animation for moving k-means before resetting data
 setTimeout(() => {  resetpoints();
 return changed;
-
 }, 500);
-
 }
 
 
+//helper function in order to push points back to original dataset
 function resetpoints(){
-let point;
-let length;
-for (let z=1;z<myChart.data.datasets.length;z++){
-  length=myChart.data.datasets[z].data.length-1
-    for (let i=0;i<length;i++){
-        point=myChart.data.datasets[z].data.pop();
-        myChart.data.datasets[0].data.push(point);
-        myChart.update();
+    let point;
+    let length;
+    for (let z=1;z<myChart.data.datasets.length;z++){
+      length=myChart.data.datasets[z].data.length-1
+        for (let i=0;i<length;i++){
+            point=myChart.data.datasets[z].data.pop();
+            myChart.data.datasets[0].data.push(point);
+            myChart.update();
+        }
     }
-}
-  myChart.update();
+      myChart.update();
+
 }
 
+//helper function in order to find which k is closest to each point
 function findGroup(x,y){
   let minimum=10000;
   let group;
@@ -267,13 +311,73 @@ for (let z=1;z<myChart.data.datasets.length;z++){
 return group;
 }
 
+function doEverything(){
 
+let triggered=false;
+
+while (triggered==false){
+//grouping
+  let length=myChart.data.datasets[0].data.length;
+  let count=0;
+      for (let i=0;i<length;i++){
+          let y=myChart.data.datasets[0].data.pop();
+          let group=findGroup(y.x,y.y);
+          myChart.data.datasets[group].data.push({x:y.x,y:y.y});
+        myChart.update();
+    }
+
+//resetting
+    let pointsInGroups=0;
+    for (let i=1;i<myChart.data.datasets.length;i++){
+        pointsInGroups+=myChart.data.datasets[i].data.length;
+      }
+    if (pointsInGroups>myChart.data.datasets.length-1){
+    document.getElementById("messageID").innerText="Starting Points are then reset to the average of all points in the group";
+}else{
+    document.getElementById("messageID").innerText="Whoops! Try grouping the points first";
+}
+
+  let changed=false;
+  let newx=0;
+  let newy=0;
+  count=0;
+
+//establishes new values for each k
+  for (let z=1;z<myChart.data.datasets.length;z++){
+    for (let i=1;i<myChart.data.datasets[z].data.length;i++){
+        newx+=myChart.data.datasets[z].data[i].x;
+        newy+=myChart.data.datasets[z].data[i].y;
+        count++;
+    }
+    if (count!=0){
+      newx=Math.round(newx/count);
+      newy=Math.round(newy/count);
+      if (myChart.data.datasets[z].data[0].x!=newx||myChart.data.datasets[z].data[0].y!=newy){
+        changed=true;
+      }
+      myChart.data.datasets[z].data[0].x=newx;
+      myChart.data.datasets[z].data[0].y=newy;
+    }
+    newx=0;
+    newy=0;
+    count=0;
+  }
+
+//showing new message if clustering algorithm has reached final groups
+if (changed==false&&pointsInGroups>myChart.data.datasets.length-1){
+  document.getElementById("messageID").innerText="Means have stabilized!";
+triggered=true;
+}
+
+myChart.update();
+if (triggered==false){
+  resetpoints();
+}
+}
+}
+//called when data is reset
 function randomizeData() {
   changeK();
   document.getElementById("messageID").innerText="";
-  document.getElementById("messageBottomID").innerText="";
-  // Randomize data button function
-//removeData(myChart);
-//addData(globalNumPoints,myChart);
-
+  //document.getElementById("messageBottomID").innerText="";
 };
